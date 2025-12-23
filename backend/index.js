@@ -362,19 +362,21 @@ app.use((req, res) => {
 });
 
 const HOST = process.env.HOST || '0.0.0.0';
+const PUBLIC_URL = process.env.PUBLIC_URL || 'http://72.61.108.21';
 
 app.listen(PORT, HOST, () => {
-  const serverUrl = HOST === '0.0.0.0' ? 'http://0.0.0.0' : `http://${HOST}`;
   console.log(`\n🚀 BTC EMA Backend API running`);
-  console.log(`📡 Host: ${HOST}:${PORT}`);
+  console.log(`📡 Listening on: ${HOST}:${PORT}`);
+  console.log(`🌐 Public URL: ${PUBLIC_URL}:${PORT}`);
   console.log(`📊 Cache TTL: ${CACHE_TTL} seconds`);
-  console.log(`🌐 CORS: ${corsOptions.origin}`);
-  console.log(`\nAvailable endpoints:`);
-  console.log(`  - GET ${serverUrl}:${PORT}/health`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/providers`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/btc/candles`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/btc/ema`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/btc/snapshot`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/btc/signals`);
-  console.log(`  - GET ${serverUrl}:${PORT}/api/btc/stats\n`);
+  console.log(`🔓 CORS: ${corsOptions.origin}`);
+  console.log(`\n📡 Available endpoints:`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/health`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/providers`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/candles`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/ema`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/snapshot`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/signals`);
+  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/stats`);
+  console.log(`\n✅ Backend ready!\n`);
 });

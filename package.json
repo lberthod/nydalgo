@@ -1,0 +1,20 @@
+{
+  "name": "btc-ema-dashboard",
+  "version": "1.0.0",
+  "description": "Bitcoin EMA Dashboard - Fullstack Vue 3 + Node.js",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test:backend": "cd backend && npm test",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": ["bitcoin", "ema", "trading", "dashboard", "vue", "nodejs"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

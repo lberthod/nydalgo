@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
 import { ProviderFactory } from './src/providers/index.js';
 import { calculateEMA, calculateMultipleEMAs } from './src/utils/ema.js';
 import { MemoryCache } from './src/utils/cache.js';
@@ -362,21 +365,66 @@ app.use((req, res) => {
 });
 
 const HOST = process.env.HOST || '0.0.0.0';
-const PUBLIC_URL = process.env.PUBLIC_URL || 'http://72.61.108.21';
+const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
+const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
+const USE_HTTPS = SSL_CERT_PATH && SSL_KEY_PATH;
 
-app.listen(PORT, HOST, () => {
-  console.log(`\n🚀 BTC EMA Backend API running`);
-  console.log(`📡 Listening on: ${HOST}:${PORT}`);
-  console.log(`🌐 Public URL: ${PUBLIC_URL}:${PORT}`);
-  console.log(`📊 Cache TTL: ${CACHE_TTL} seconds`);
-  console.log(`🔓 CORS: ${corsOptions.origin}`);
-  console.log(`\n📡 Available endpoints:`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/health`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/providers`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/candles`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/ema`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/snapshot`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/signals`);
-  console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/stats`);
-  console.log(`\n✅ Backend ready!\n`);
-});
+let server;
+
+if (USE_HTTPS) {
+  try {
+    const httpsOptions = {
+      cert: fs.readFileSync(SSL_CERT_PATH),
+      key: fs.readFileSync(SSL_KEY_PATH)
+    };
+    server = https.createServer(httpsOptions, app);
+    const PUBLIC_URL = process.env.PUBLIC_URL || `https://srv1126284.hstgr.cloud`;
+    
+    server.listen(PORT, HOST, () => {
+      console.log(`\n🚀 BTC EMA Backend API running (HTTPS)`);
+      console.log(`📡 Listening on: ${HOST}:${PORT}`);
+      console.log(`🌐 Public URL: ${PUBLIC_URL}:${PORT}`);
+      console.log(`🔒 SSL: Enabled`);
+      console.log(`📊 Cache TTL: ${CACHE_TTL} seconds`);
+      console.log(`🔓 CORS: ${corsOptions.origin}`);
+      console.log(`\n📡 Available endpoints:`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/health`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/providers`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/candles`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/ema`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/snapshot`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/signals`);
+      console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/stats`);
+      console.log(`\n✅ Backend ready!\n`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start HTTPS server:', error.message);
+    console.log('Falling back to HTTP...\n');
+    startHttpServer();
+  }
+} else {
+  startHttpServer();
+}
+
+function startHttpServer() {
+  server = http.createServer(app);
+  const PUBLIC_URL = process.env.PUBLIC_URL || 'http://72.61.108.21';
+  
+  server.listen(PORT, HOST, () => {
+    console.log(`\n🚀 BTC EMA Backend API running (HTTP)`);
+    console.log(`📡 Listening on: ${HOST}:${PORT}`);
+    console.log(`🌐 Public URL: ${PUBLIC_URL}:${PORT}`);
+    console.log(`⚠️  SSL: Disabled (add SSL_CERT_PATH and SSL_KEY_PATH to enable HTTPS)`);
+    console.log(`📊 Cache TTL: ${CACHE_TTL} seconds`);
+    console.log(`🔓 CORS: ${corsOptions.origin}`);
+    console.log(`\n📡 Available endpoints:`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/health`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/providers`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/candles`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/ema`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/snapshot`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/signals`);
+    console.log(`  - GET ${PUBLIC_URL}:${PORT}/api/btc/stats`);
+    console.log(`\n✅ Backend ready!\n`);
+  });
+}
